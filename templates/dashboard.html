@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block titulo %}Painel · Almoxarifado{% endblock %}
+
+{% block conteudo %}
+<div class="topo-pagina">
+  <div>
+    <p class="eyebrow">Visão geral</p>
+    <h2>Painel do almoxarifado</h2>
+  </div>
+  {% if current_user.pode_operar_estoque %}
+  <a href="{{ url_for('movimentacoes_nova') }}" class="btn btn-ambar">+ Nova movimentação</a>
+  {% endif %}
+</div>
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="valor">{{ total_produtos }}</div>
+    <div class="rotulo">Produtos cadastrados</div>
+  </div>
+  <div class="kpi">
+    <div class="valor">{{ total_itens }}</div>
+    <div class="rotulo">Itens em estoque</div>
+  </div>
+  <div class="kpi {{ 'alerta' if estoque_baixo else '' }}">
+    <div class="valor">{{ estoque_baixo|length }}</div>
+    <div class="rotulo">Itens em estoque baixo</div>
+  </div>
+  <div class="kpi">
+    <div class="valor">{{ movimentacoes|length }}</div>
+    <div class="rotulo">Movimentações recentes</div>
+  </div>
+</div>
+
+<div class="painel">
+  <h3>Estoque baixo (abaixo ou no mínimo)</h3>
+  {% if estoque_baixo %}
+  <table>
+    <thead>
+      <tr><th>Código</th><th>Produto</th><th>Qtd. atual</th><th>Qtd. mínima</th><th>Local</th></tr>
+    </thead>
+    <tbody>
+      {% for p in estoque_baixo %}
+      <tr>
+        <td class="codigo">{{ p.codigo }}</td>
+        <td>{{ p.nome }}</td>
+        <td><span class="selo selo-baixo">{{ p.quantidade }}</span></td>
+        <td>{{ p.estoque_minimo }}</td>
+        <td>{{ p.localizacao or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--aco-claro);margin:0;">Nenhum item abaixo do estoque mínimo. Tudo em ordem.</p>
+  {% endif %}
+</div>
+
+<div class="painel">
+  <h3>Estoque de produtos</h3>
+  {% if produtos %}
+  <div class="tabela-rolavel">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th><th>Nome</th><th>Categoria</th><th>Qtd.</th><th>Unid.</th><th>Local</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in produtos %}
+        <tr>
+          <td class="codigo">{{ p.codigo }}</td>
+          <td>{{ p.nome }}</td>
+          <td>{{ p.categoria or '—' }}</td>
+          <td>{{ p.quantidade }}</td>
+          <td>{{ p.unidade or '—' }}</td>
+          <td>{{ p.localizacao or '—' }}</td>
+          <td>
+            {% if p.quantidade <= p.estoque_minimo %}
+              <span class="selo selo-baixo">Baixo</span>
+            {% else %}
+              <span class="selo selo-ok">OK</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="vazio">
+    <strong>Nenhum produto cadastrado</strong>
+  </div>
+  {% endif %}
+</div>
+
+<div class="painel">
+  <h3>Últimas movimentações</h3>
+  {% if movimentacoes %}
+  <table>
+    <thead>
+      <tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Qtd.</th><th>Responsável</th></tr>
+    </thead>
+    <tbody>
+      {% for m in movimentacoes %}
+      <tr>
+        <td>{{ m.data.strftime('%d/%m/%Y %H:%M') if m.data else '—' }}</td>
+        <td>{{ m.produto_nome }}</td>
+        <td>
+          {% if m.tipo == 'entrada' %}
+            <span class="selo selo-entrada">Entrada</span>
+          {% else %}
+            <span class="selo selo-saida">Saída</span>
+          {% endif %}
+        </td>
+        <td>{{ m.quantidade }}</td>
+        <td>{{ m.responsavel or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="vazio">
+    <strong>Nenhuma movimentação ainda</strong>
+    Registre uma entrada ou saída para começar o histórico.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

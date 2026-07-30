@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block titulo %}Novo usuário · Almoxarifado{% endblock %}
+
+{% block conteudo %}
+<div class="topo-pagina">
+  <div>
+    <p class="eyebrow">Acesso ao sistema</p>
+    <h2>Novo usuário</h2>
+  </div>
+</div>
+
+<div class="painel">
+  <form method="post">
+    <div class="form-grid">
+      <div class="campo">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" name="nome" value="{{ form.get('nome', '') }}" required>
+      </div>
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" value="{{ form.get('email', '') }}" required>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" minlength="6" required>
+      </div>
+      <div class="campo">
+        <label for="perfil">Perfil de acesso</label>
+        <select id="perfil" name="perfil" required>
+          <option value="user" {{ 'selected' if form.get('perfil') == 'user' else '' }}>Usuário (acesso apenas ao Painel)</option>
+          <option value="tecnico" {{ 'selected' if form.get('perfil') == 'tecnico' else '' }}>Técnico (Painel, Produtos e Movimentações)</option>
+          <option value="admin" {{ 'selected' if form.get('perfil') == 'admin' else '' }}>Administrador (acesso total)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-acoes">
+      <button type="submit" class="btn btn-ambar">Criar usuário</button>
+      <a href="{{ url_for('usuarios_lista') }}" class="btn btn-secundario">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

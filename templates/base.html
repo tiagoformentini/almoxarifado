@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block titulo %}Almoxarifado{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <div class="tag">Estoque &middot; Depósito</div>
+        <h1>Almoxarifado</h1>
+      </div>
+      
+      {% if current_user.is_authenticated %}
+      <div class="sidebar__usuario">
+        <div class="sidebar__usuario-nome">{{ current_user.nome }}</div>
+        <div class="sidebar__usuario-perfil">
+          {% if current_user.is_admin %}Administrador
+          {% elif current_user.is_tecnico %}Técnico
+          {% else %}Usuário
+          {% endif %}
+        </div>
+        <a href="{{ url_for('logout') }}" class="sidebar__sair">Sair</a>
+      </div>
+      {% endif %}
+      
+      <nav>
+        <a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}">📊 Painel</a>
+        {% if current_user.is_authenticated and current_user.pode_operar_estoque %}
+        <a href="{{ url_for('produtos_lista') }}" class="{{ 'ativo' if request.endpoint and request.endpoint.startswith('produtos') else '' }}">📦 Produtos</a>
+        <a href="{{ url_for('movimentacoes_lista') }}" class="{{ 'ativo' if request.endpoint and request.endpoint.startswith('movimentacoes') else '' }}">🔁 Movimentações</a>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.is_admin %}
+        <a href="{{ url_for('usuarios_lista') }}" class="{{ 'ativo' if request.endpoint and request.endpoint.startswith('usuarios') else '' }}">👤 Usuários</a>
+        {% endif %}
+      </nav>
+      
+      <div class="sidebar__rodape">FIRESTORE · almoxarifado-81ce6</div>
+    </aside>
+
+    <main class="conteudo">
+      {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+          {% for categoria, mensagem in mensagens %}
+            <div class="flash flash-{{ categoria }}">{{ mensagem }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block conteudo %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

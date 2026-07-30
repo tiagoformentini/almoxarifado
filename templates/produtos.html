@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Produtos · Almoxarifado{% endblock %}
+
+{% block conteudo %}
+<div class="topo-pagina">
+  <div>
+    <p class="eyebrow">Catálogo</p>
+    <h2>Produtos</h2>
+  </div>
+  <a href="{{ url_for('produtos_novo') }}" class="btn btn-ambar">+ Novo produto</a>
+</div>
+
+<form class="busca-form" method="get">
+  <input type="text" name="q" value="{{ busca }}" placeholder="Buscar por nome, código ou categoria...">
+  <button class="btn btn-secundario" type="submit">Buscar</button>
+</form>
+
+<div class="painel">
+  {% if produtos %}
+  <div class="tabela-rolavel">
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th><th>Nome</th><th>Categoria</th><th>Qtd.</th><th>Unid.</th><th>Local</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in produtos %}
+      <tr>
+        <td class="codigo">{{ p.codigo }}</td>
+        <td>{{ p.nome }}</td>
+        <td>{{ p.categoria or '—' }}</td>
+        <td>{{ p.quantidade }}</td>
+        <td>{{ p.unidade or '—' }}</td>
+        <td>{{ p.localizacao or '—' }}</td>
+        <td>
+          {% if p.quantidade <= p.estoque_minimo %}
+            <span class="selo selo-baixo">Baixo</span>
+          {% else %}
+            <span class="selo selo-ok">OK</span>
+          {% endif %}
+        </td>
+        <td class="acoes-linha">
+          <a href="{{ url_for('produtos_editar', produto_id=p.id) }}" class="btn btn-secundario">Editar</a>
+          <form action="{{ url_for('produtos_excluir', produto_id=p.id) }}" method="post" onsubmit="return confirm('Excluir o produto {{ p.nome }}?');">
+            <button type="submit" class="btn btn-perigo">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <div class="vazio">
+    <strong>Nenhum produto encontrado</strong>
+    Cadastre o primeiro item do seu almoxarifado.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

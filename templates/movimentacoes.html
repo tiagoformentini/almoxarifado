@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titulo %}Movimentações · Almoxarifado{% endblock %}
+
+{% block conteudo %}
+<div class="topo-pagina">
+  <div>
+    <p class="eyebrow">Histórico</p>
+    <h2>Movimentações</h2>
+  </div>
+  <a href="{{ url_for('movimentacoes_nova') }}" class="btn btn-ambar">+ Nova movimentação</a>
+</div>
+
+<div class="painel">
+  {% if movimentacoes %}
+  <table>
+    <thead>
+      <tr><th>Data</th><th>Código</th><th>Produto</th><th>Tipo</th><th>Qtd.</th><th>Responsável</th><th>Observação</th></tr>
+    </thead>
+    <tbody>
+      {% for m in movimentacoes %}
+      <tr>
+        <td>{{ m.data.strftime('%d/%m/%Y %H:%M') if m.data else '—' }}</td>
+        <td class="codigo">{{ m.produto_codigo or '—' }}</td>
+        <td>{{ m.produto_nome }}</td>
+        <td>
+          {% if m.tipo == 'entrada' %}
+            <span class="selo selo-entrada">Entrada</span>
+          {% else %}
+            <span class="selo selo-saida">Saída</span>
+          {% endif %}
+        </td>
+        <td>{{ m.quantidade }}</td>
+        <td>{{ m.responsavel or '—' }}</td>
+        <td>{{ m.observacao or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="vazio">
+    <strong>Nenhuma movimentação registrada</strong>
+    Registre entradas e saídas de itens do estoque.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

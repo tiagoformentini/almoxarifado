@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Nova movimentação · Almoxarifado{% endblock %}
+
+{% block conteudo %}
+<div class="topo-pagina">
+  <div>
+    <p class="eyebrow">Entrada / Saída</p>
+    <h2>Nova movimentação</h2>
+  </div>
+</div>
+
+<div class="painel">
+  {% if not produtos %}
+    <div class="vazio">
+      <strong>Nenhum produto cadastrado</strong>
+      Cadastre um produto antes de registrar movimentações.
+    </div>
+    <a href="{{ url_for('produtos_novo') }}" class="btn btn-ambar">+ Cadastrar produto</a>
+  {% else %}
+  <form method="post">
+    <div class="form-grid">
+      <div class="campo full">
+        <label for="produto_id">Produto</label>
+        <select id="produto_id" name="produto_id" required>
+          <option value="" disabled {{ 'selected' if not form.get('produto_id') else '' }}>Selecione um produto...</option>
+          {% for p in produtos %}
+          <option value="{{ p.id }}" {{ 'selected' if form.get('produto_id') == p.id else '' }}>
+            {{ p.codigo }} — {{ p.nome }} (estoque atual: {{ p.quantidade }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="tipo">Tipo de movimentação</label>
+        <select id="tipo" name="tipo" required>
+          <option value="entrada" {{ 'selected' if form.get('tipo') == 'entrada' else '' }}>Entrada</option>
+          <option value="saida" {{ 'selected' if form.get('tipo') == 'saida' else '' }}>Saída</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="quantidade">Quantidade</label>
+        <input type="number" id="quantidade" name="quantidade" min="1" value="{{ form.get('quantidade', 1) }}" required>
+      </div>
+      <div class="campo">
+        <label for="responsavel">Responsável</label>
+        <input type="text" id="responsavel" name="responsavel" value="{{ form.get('responsavel', '') }}" placeholder="Nome de quem retirou/entregou">
+      </div>
+      <div class="campo full">
+        <label for="observacao">Observação (opcional)</label>
+        <textarea id="observacao" name="observacao" rows="3" placeholder="Ex: retirado para manutenção da linha 2">{{ form.get('observacao', '') }}</textarea>
+      </div>
+    </div>
+
+    <div class="form-acoes">
+      <button type="submit" class="btn btn-ambar">Registrar movimentação</button>
+      <a href="{{ url_for('movimentacoes_lista') }}" class="btn btn-secundario">Cancelar</a>
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}
